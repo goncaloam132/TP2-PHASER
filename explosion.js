@@ -3,5 +3,6 @@ class Explosion extends Phaser.GameObjects.Sprite{
     super(scene, x, y, "explosion");
     scene.add.existing(this);
     this.play("explode");
+    this.setScale(2);
   }
 }

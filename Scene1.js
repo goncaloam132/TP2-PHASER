@@ -59,21 +59,15 @@ class Scene1 extends Phaser.Scene {
     this.background.displayHeight = this.sys.game.config.height;
 
     // Adicionar texto de título
-    this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 50, "SpaceShip", {
-      font: "24px Arial",
-      fill: "#ffffff"
-    }).setOrigin(0.5, 0.5);
+    this.add.bitmapText(this.cameras.main.centerX, 150, "pixelFont", "SpaceShip", 60).setOrigin(0.5, 0.5);
 
     // Exibir o recorde
-    this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 100, "Record: " + this.scoreRecord, {
-      font: "16px Arial",
-      fill: "#ffffff"
-    }).setOrigin(0.5, 0.5);
+    this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 250, "pixelFont", "Record: " + this.scoreRecord, 32).setOrigin(0.5, 0.5);
 
     // Exibir botão Start Game e ajustar o tamanho
     let startButton = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'startButton')
-                             .setInteractive()
-                             .setScale(0.2);  
+                             .setInteractive({ useHandCursor: true })
+                             .setScale(0.3);
 
     startButton.on('pointerdown', () => {
       this.startGame();
@@ -87,6 +81,15 @@ class Scene1 extends Phaser.Scene {
       startButton.clearTint();
     });
 
+    // Botão de Instruções
+    let instructionsButton = this.add.bitmapText(this.cameras.main.centerX, this.cameras.main.centerY + 100, "pixelFont", "Comandos", 32)
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    instructionsButton.on('pointerdown', () => this.scene.start("instructionsGame"));
+    instructionsButton.on('pointerover', () => instructionsButton.setTint(0x44ff44));
+    instructionsButton.on('pointerout', () => instructionsButton.clearTint());
+
     // Reproduzir a música do menu com fade in, se não estiver a tocar
     if (!this.menuMusic || !this.menuMusic.isPlaying) {
       this.menuMusic = this.sound.add("menuMusic", { volume: 0, loop: true });
@@ -97,34 +100,6 @@ class Scene1 extends Phaser.Scene {
         duration: 1000,
         ease: 'Linear'
       });
-    }
-
-    this.anims.create({
-      key: "life",
-      frames: this.anims.generateFrameNumbers("power-up", {
-        start: 2, 
-        end: 3   
-      }),
-      frameRate: 20,
-      repeat: -1
-    });
-  }
-
-  startGame() {
-    // Parar a música do menu com fade out
-    if (this.menuMusic && this.menuMusic.isPlaying) {
-      this.tweens.add({
-        targets: this.menuMusic,
-        volume: 0,
-        duration: 1000,
-        ease: 'Linear',
-        onComplete: () => {
-          this.menuMusic.stop();
-          this.scene.start("playGame"); // Iniciar a cena do jogo após o fade out acabar
-        }
-      });
-    } else {
-      this.scene.start("playGame"); // Iniciar a cena do jogo imediatamente se a música não estiver a tocar
     }
 
     // Configurar animações
@@ -175,7 +150,19 @@ class Scene1 extends Phaser.Scene {
     });
     this.anims.create({
       key: "thrust",
-      frames: this.anims.generateFrameNumbers("player"),
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 1,
+        end: 2
+      }),
+      frameRate: 20,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "idle",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 0,
+        end: 0
+      }),
       frameRate: 20,
       repeat: -1
     });
@@ -186,5 +173,23 @@ class Scene1 extends Phaser.Scene {
       frameRate: 20,
       repeat: -1
     });
+  }
+
+  startGame() {
+    // Parar a música do menu com fade out
+    if (this.menuMusic && this.menuMusic.isPlaying) {
+      this.tweens.add({
+        targets: this.menuMusic,
+        volume: 0,
+        duration: 1000,
+        ease: 'Linear',
+        onComplete: () => {
+          this.menuMusic.stop();
+          this.scene.start("playGame"); // Iniciar a cena do jogo após o fade out acabar
+        }
+      });
+    } else {
+      this.scene.start("playGame"); // Iniciar a cena do jogo imediatamente se a música não estiver a tocar
+    }
   }
 }
